@@ -61,6 +61,7 @@ class LogRangeCommand extends BaseCommand
         $this->addCommandArgument('-s');
         $this->addCommandArgument('--pretty=raw');
         $this->addCommandArgument('--no-color');
+        $this->addCommandArgument('--decorate=full');
 
         if (null !== $limit) {
             $limit = (int)$limit;

@@ -34,6 +34,8 @@ use \GitElephant\Repository;
  */
 class Commit implements TreeishInterface, \Countable
 {
+    const LOG_REGEXP = '/^commit (\w+)( \((.*)\))?$/'; // example string: "commit hash (optional tags)"
+
     /**
      * @var \GitElephant\Repository
      */
@@ -99,6 +101,13 @@ class Commit implements TreeishInterface, \Countable
      * @var \Datetime
      */
     private $datetimeCommitter;
+
+    /**
+     * the tags on this commit
+     *
+     * @var array
+     */
+    private $tags;
 
     /**
      * Class constructor
@@ -224,8 +233,17 @@ class Commit implements TreeishInterface, \Countable
         $message = '';
         foreach ($outputLines as $line) {
             $matches = array();
-            if (preg_match('/^commit (\w+)$/', $line, $matches) > 0) {
+            if (preg_match(Commit::LOG_REGEXP, $line, $matches) > 0) {
                 $this->sha = $matches[1];
+                $this->tags = array();
+                if (isset($matches[3])) {
+                    $refNameArray = explode(', ', str_replace('tag: ', '', $matches[3]));
+                    foreach ($refNameArray as $refName) {
+                        if (preg_match('/^(refs\/tags\/)(.*)/', $refName, $tagMatches)) {
+                            $this->tags[] = new Tag($this->getRepository(), $tagMatches[2]);
+                        }
+                    }
+                }
             }
             if (preg_match('/^tree (\w+)$/', $line, $matches) > 0) {
                 $this->tree = $matches[1];
@@ -386,6 +404,16 @@ class Commit implements TreeishInterface, \Countable
     public function getDatetimeCommitter()
     {
         return $this->datetimeCommitter;
+    }
+
+    /**
+     * tags
+     *
+     * @return array
+     */
+    public function getTags()
+    {
+        return $this->tags;
     }
 
     /**

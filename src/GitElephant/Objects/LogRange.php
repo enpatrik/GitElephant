@@ -105,7 +105,7 @@ class LogRange implements \ArrayAccess, \Countable, \Iterator
         $commitLines = null;
         $this->rangeCommits = array();
         foreach ($outputLines as $line) {
-            if (preg_match('/^commit (\w+)$/', $line) > 0) {
+            if (preg_match(Commit::LOG_REGEXP, $line) > 0) {
                 if (null !== $commitLines) {
                     $this->rangeCommits[] = Commit::createFromOutputLines($this->getRepository(), $commitLines);
                 }

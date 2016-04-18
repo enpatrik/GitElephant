@@ -116,7 +116,7 @@ class Log implements \ArrayAccess, \Countable, \Iterator
     private function parseOutputLines($outputLines)
     {
         $this->commits = array();
-        $commits = Utilities::pregSplitFlatArray($outputLines, '/^commit (\w+)$/');
+        $commits = Utilities::pregSplitFlatArray($outputLines, Commit::LOG_REGEXP);
         foreach ($commits as $commitOutputLines) {
             $this->commits[] = Commit::createFromOutputLines($this->getRepository(), $commitOutputLines);
         }
